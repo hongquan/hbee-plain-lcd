@@ -17,7 +17,8 @@
           "id": "lcd1",
           "top": 0,
           "left": -50,
-          "rotate": 270
+          "rotate": 270,
+          "attrs": { "flipHorizontal": "1" }
         }
     ],
     "connections": [
