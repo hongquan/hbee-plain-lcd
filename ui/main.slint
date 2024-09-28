@@ -1,7 +1,9 @@
 import { VerticalBox, HorizontalBox, GridBox } from "std-widgets.slint";
 
 import { SensorData, Health  } from "./types.slint";
+import { NativeUtils } from "./globals.slint";
 
+export { NativeUtils }
 
 export component AppWindow inherits Window {
     in property <string> farm_codename;
@@ -68,7 +70,7 @@ export component AppWindow inherits Window {
                 }
 
                 Text {
-                    text: root.health.gsm-signal-strength + " dBm";
+                    text: root.health.has-gsm-signal-strength ? root.health.gsm-signal-strength + " dBm" : "--";
                     vertical-alignment: center;
                 }
             }
@@ -125,7 +127,7 @@ export component AppWindow inherits Window {
                     }
 
                     Text {
-                        text: root.sensor.has-solution-temperature ? root.sensor.solution-temperature : "--";
+                        text: root.sensor.has-solution-temperature ? NativeUtils.display-float(root.sensor.solution-temperature) : "--";
                         font-size: 24px;
                         horizontal-alignment: right;
                         vertical-alignment: center;
@@ -176,7 +178,7 @@ export component AppWindow inherits Window {
                     }
 
                     Text {
-                        text: root.sensor.has-power-of-hydrogen ? root.sensor.power-of-hydrogen : "--";
+                        text: root.sensor.has-power-of-hydrogen ? NativeUtils.display-float(root.sensor.power-of-hydrogen) : "--";
                         font-size: 24px;
                         horizontal-alignment: right;
                         vertical-alignment: center;
@@ -195,7 +197,7 @@ export component AppWindow inherits Window {
                     }
 
                     Text {
-                        text: root.sensor.has-solution-salinity ? root.sensor.solution-salinity : "--";
+                        text: root.sensor.has-solution-salinity ? NativeUtils.display-float(root.sensor.solution-salinity) : "--";
                         font-size: 24px;
                         horizontal-alignment: right;
                         vertical-alignment: center;

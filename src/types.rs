@@ -98,7 +98,29 @@ pub struct SensorDataMessage {
     pub total_dissolved_solids: Option<f32>,
     #[serde(rename = "solSal")]
     pub solution_salinity: Option<f32>,
-    pub _gsm_signal_strength: Option<i16>,
+}
+
+impl SensorDataMessage {
+    pub fn new_random() -> Self {
+        let electrical_conductivity = Some(fastrand::u16(1000..2000));
+        let solution_salinity = Some(fastrand::u16(1000..2000) as f32);
+        let power_of_hydrogen = Some(fastrand::u8(40..80) as f32 / 10.0);
+        let solution_temperature = Some(fastrand::u16(200..300) as f32 / 10.0);
+        Self {
+            electrical_conductivity,
+            solution_salinity,
+            power_of_hydrogen,
+            solution_temperature,
+            ..Default::default()
+        }
+    }
+
+    pub fn regen_random(&mut self) {
+        self.electrical_conductivity = Some(fastrand::u16(1000..2000));
+        self.solution_salinity = Some(fastrand::u16(1000..2000) as f32);
+        self.power_of_hydrogen = Some(fastrand::u8(40..80) as f32 / 10.0);
+        self.solution_temperature = Some(fastrand::u16(200..300) as f32 / 10.0);
+    }
 }
 
 pub(crate) struct WindowSystem {
