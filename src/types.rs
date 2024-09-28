@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use display_interface_spi::SPIInterface;
 use esp_idf_svc::hal::gpio::{Gpio10, Gpio11, Gpio12, Gpio13, Gpio46, Gpio9, Output, PinDriver};
 use esp_idf_svc::hal::peripherals::Peripherals;
@@ -5,7 +7,14 @@ use esp_idf_svc::hal::spi::{SpiDeviceDriver, SpiDriver, SPI2};
 use esp_idf_svc::sys::EspError;
 use mipidsi::error::Error as DisplayError;
 use mipidsi::models::ILI9341Rgb565;
+use serde::Serialize;
+use serde_with::skip_serializing_none;
+use slint::platform::software_renderer::{MinimalSoftwareWindow, Rgb565Pixel};
+use slint::platform::SetPlatformError;
+use slint::PlatformError;
 use u8g2_fonts::Error as FontError;
+
+use crate::consts::DISPLAY_WIDTH;
 
 pub struct FrontDisplayBlock {
     pub spi: SPI2,
@@ -50,6 +59,10 @@ pub enum AppError {
     DisplayError(DisplayError),
     #[error("{0:?}")]
     FontError(FontError<DisplayError>),
+    #[error("{0:?}")]
+    PlatformError(PlatformError),
+    #[error("{0:?}")]
+    SetPlatformError(SetPlatformError),
 }
 
 impl From<DisplayError> for AppError {
@@ -61,5 +74,68 @@ impl From<DisplayError> for AppError {
 impl From<FontError<DisplayError>> for AppError {
     fn from(e: FontError<DisplayError>) -> Self {
         Self::FontError(e)
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DeviceCondition {
+    pub gsm_signal_strength: Option<i16>,
+    pub battery_level: Option<u8>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct SensorDataMessage {
+    #[serde(rename = "solEC")]
+    pub electrical_conductivity: Option<u16>,
+    #[serde(rename = "solRes")]
+    pub electrical_resistivity: Option<f32>,
+    #[serde(rename = "solPH")]
+    pub power_of_hydrogen: Option<f32>,
+    #[serde(rename = "solT")]
+    pub solution_temperature: Option<f32>,
+    #[serde(rename = "solTDS")]
+    pub total_dissolved_solids: Option<f32>,
+    #[serde(rename = "solSal")]
+    pub solution_salinity: Option<f32>,
+    pub _gsm_signal_strength: Option<i16>,
+}
+
+pub(crate) struct WindowSystem {
+    pub(crate) slint_window: Rc<MinimalSoftwareWindow>,
+    pub(crate) app_window: crate::ui::AppWindow,
+    pub(crate) line_buffer: [Rgb565Pixel; DISPLAY_WIDTH as usize],
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct AppConfig {
+    pub serial_number: String,
+    pub farm_codename: String,
+}
+
+#[derive(Debug)]
+pub enum UIInitError {
+    PlatformError(PlatformError),
+    SetPlatformError(SetPlatformError),
+}
+
+impl From<PlatformError> for UIInitError {
+    fn from(e: PlatformError) -> Self {
+        Self::PlatformError(e)
+    }
+}
+
+impl From<SetPlatformError> for UIInitError {
+    fn from(e: SetPlatformError) -> Self {
+        Self::SetPlatformError(e)
+    }
+}
+
+impl From<UIInitError> for AppError {
+    fn from(value: UIInitError) -> Self {
+        match value {
+            UIInitError::PlatformError(e) => Self::PlatformError(e),
+            UIInitError::SetPlatformError(e) => Self::SetPlatformError(e),
+        }
     }
 }

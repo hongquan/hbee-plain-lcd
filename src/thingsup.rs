@@ -9,10 +9,13 @@ use log::warn;
 use mipidsi::error::InitError;
 use mipidsi::models::ILI9341Rgb565;
 use mipidsi::options::{Orientation, Rotation};
+use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType, Rgb565Pixel};
+use slint::PhysicalSize;
 
 use crate::consts::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
 use crate::esp_err;
-use crate::types::{FrontDisplayBlock, FrontDisplayDriver};
+use crate::types::{FrontDisplayBlock, FrontDisplayDriver, UIInitError, WindowSystem};
+use crate::ui::{self, UIPlatform};
 
 pub(crate) fn init_front_display<'d>(
     p: FrontDisplayBlock,
@@ -45,4 +48,20 @@ pub(crate) fn init_front_display<'d>(
                 esp_err!(ESP_ERR_INVALID_STATE)
             }
         })
+}
+
+pub(crate) fn init_window() -> Result<WindowSystem, UIInitError> {
+    let slint_window = MinimalSoftwareWindow::new(RepaintBufferType::ReusedBuffer);
+    slint_window.set_size(PhysicalSize::new(
+        DISPLAY_WIDTH as u32,
+        DISPLAY_HEIGHT as u32,
+    ));
+    slint::platform::set_platform(Box::new(UIPlatform(slint_window.clone())))?;
+    let app_window = ui::AppWindow::new()?;
+    let line_buffer = [Rgb565Pixel(0); DISPLAY_WIDTH as usize];
+    Ok(WindowSystem {
+        slint_window,
+        app_window,
+        line_buffer,
+    })
 }

@@ -3,14 +3,17 @@ mod display;
 mod macros;
 mod thingsup;
 mod types;
+mod ui;
 
 use core::time::Duration;
 use std::thread::sleep;
 
 use esp_idf_svc::hal::peripherals::Peripherals;
 use esp_idf_svc::hal::reset::restart;
+use thingsup::init_window;
+use types::AppConfig;
+use ui::UILineRenderrer;
 
-use crate::display::show_intro;
 use crate::thingsup::init_front_display;
 use crate::types::{AppError, HBeePeripherals};
 
@@ -33,7 +36,25 @@ fn try_serving() -> Result<(), AppError> {
     let peripherals = Peripherals::take()?;
     let periph = HBeePeripherals::from(peripherals);
     let mut front_display = init_front_display(periph.front_display)?;
-    show_intro(&mut front_display)?;
+    let mut winsys = init_window()?;
+    let app_config = AppConfig {
+        serial_number: "hb00000".to_string(),
+        farm_codename: "happy-farm".to_string(),
+    };
+
+    winsys
+        .app_window
+        .set_farm_codename(app_config.farm_codename.as_str().into());
+    winsys
+        .app_window
+        .set_serial_number(app_config.serial_number.as_str().into());
+    winsys.slint_window.draw_if_needed(|renderer| {
+        renderer.render_by_line(UILineRenderrer {
+            display: &mut front_display,
+            line_buffer: &mut winsys.line_buffer,
+        });
+    });
+
     loop {
         sleep(Duration::from_secs(5));
     }
