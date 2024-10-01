@@ -38,6 +38,7 @@ thiserror = "1.0.64"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_with = "3.9.0"
 fastrand = "2.1.1"
+ili9341 = "0.6.0"
 
 [dependencies.slint]
 version = "1.8.0"

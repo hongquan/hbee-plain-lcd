@@ -1,7 +1,9 @@
 use std::rc::Rc;
 
 use display_interface_spi::SPIInterface;
-use esp_idf_svc::hal::gpio::{Gpio10, Gpio11, Gpio12, Gpio13, Gpio46, Gpio9, Output, PinDriver};
+use esp_idf_svc::hal::gpio::{
+    Gpio10, Gpio11, Gpio12, Gpio13, Gpio14, Gpio4, Gpio9, Output, PinDriver
+};
 use esp_idf_svc::hal::peripherals::Peripherals;
 use esp_idf_svc::hal::spi::{SpiDeviceDriver, SpiDriver, SPI2};
 use esp_idf_svc::sys::EspError;
@@ -20,10 +22,11 @@ pub struct FrontDisplayBlock {
     pub spi: SPI2,
     pub pin_cs: Gpio10,
     pub pin_reset: Gpio9,
-    pub pin_dc: Gpio46,
+    pub pin_dc: Gpio4,
     pub pin_mosi: Gpio11,
     pub pin_clk: Gpio12,
     pub pin_miso: Gpio13,
+    pub pin_backlight: Gpio14,
 }
 
 pub struct HBeePeripherals {
@@ -36,17 +39,18 @@ impl From<Peripherals> for HBeePeripherals {
             spi: p.spi2,
             pin_cs: p.pins.gpio10,
             pin_reset: p.pins.gpio9,
-            pin_dc: p.pins.gpio46,
+            pin_dc: p.pins.gpio4,
             pin_mosi: p.pins.gpio11,
             pin_clk: p.pins.gpio12,
             pin_miso: p.pins.gpio13,
+            pin_backlight: p.pins.gpio14,
         };
         Self { front_display }
     }
 }
 
 pub type FrontDisplayDriver<'d> = mipidsi::Display<
-    SPIInterface<SpiDeviceDriver<'d, SpiDriver<'d>>, PinDriver<'d, Gpio46, Output>>,
+    SPIInterface<SpiDeviceDriver<'d, SpiDriver<'d>>, PinDriver<'d, Gpio4, Output>>,
     ILI9341Rgb565,
     PinDriver<'d, Gpio9, Output>,
 >;

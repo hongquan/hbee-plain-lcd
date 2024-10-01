@@ -1,11 +1,10 @@
 use display_interface_spi::SPIInterface;
 use esp_idf_svc::hal::delay::Ets;
-use esp_idf_svc::hal::gpio::PinDriver;
-use esp_idf_svc::hal::spi::config::MODE_3;
+use esp_idf_svc::hal::gpio::{AnyOutputPin, PinDriver};
 use esp_idf_svc::hal::spi::{SpiConfig, SpiDeviceDriver, SpiDriverConfig};
 use esp_idf_svc::hal::units::MegaHertz;
 use esp_idf_svc::sys::{EspError, ESP_ERR_INVALID_STATE};
-use log::warn;
+use log::{info, warn};
 use mipidsi::error::InitError;
 use mipidsi::models::ILI9341Rgb565;
 use mipidsi::options::{Orientation, Rotation};
@@ -17,27 +16,31 @@ use crate::esp_err;
 use crate::types::{FrontDisplayBlock, FrontDisplayDriver, UIInitError, WindowSystem};
 use crate::ui::{self, UIPlatform};
 
+// Ref: https://github.com/esp-rs/esp-idf-hal/blob/master/examples/spi_st7789.rs
 pub(crate) fn init_front_display<'d>(
     p: FrontDisplayBlock,
 ) -> Result<FrontDisplayDriver<'d>, EspError> {
-    let rst = PinDriver::output(p.pin_reset)?;
-    let dc = PinDriver::output(p.pin_dc)?;
+    let pin_rst = PinDriver::output(p.pin_reset)?;
+    let pin_dc = PinDriver::output(p.pin_dc)?;
+    let mut backlight = PinDriver::output(p.pin_backlight)?;
+    info!("Turning on backlight for LCD");
+    backlight.set_high()?;
 
     let config = SpiConfig::default()
-        .baudrate(MegaHertz(26).into())
-        .data_mode(MODE_3);
+        .baudrate(MegaHertz(16).into())
+        .data_mode(ili9341::SPI_MODE);
     let device = SpiDeviceDriver::new_single(
         p.spi,
         p.pin_clk,
         p.pin_mosi,
         Some(p.pin_miso),
-        Some(p.pin_cs),
+        None::<AnyOutputPin>,
         &SpiDriverConfig::default(),
         &config,
     )?;
-    let spi_interface = SPIInterface::new(device, dc);
+    let spi_interface = SPIInterface::new(device, pin_dc);
     mipidsi::Builder::new(ILI9341Rgb565, spi_interface)
-        .reset_pin(rst)
+        .reset_pin(pin_rst)
         .display_size(DISPLAY_HEIGHT, DISPLAY_WIDTH)
         .orientation(Orientation::new().rotate(Rotation::Deg90))
         .init(&mut Ets)

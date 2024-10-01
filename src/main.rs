@@ -40,7 +40,9 @@ fn try_serving() -> Result<(), AppError> {
     let peripherals = Peripherals::take()?;
     let periph = HBeePeripherals::from(peripherals);
     let mut front_display = init_front_display(periph.front_display)?;
+    info!("Setup LCD front display");
     let mut winsys = init_window()?;
+    info!("Created window system.");
     let app_config = AppConfig {
         serial_number: "hb00000".to_string(),
         farm_codename: "happy-farm".to_string(),

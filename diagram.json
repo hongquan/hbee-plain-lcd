@@ -34,15 +34,16 @@
             "",
             []
         ],
-        [ "esp:11", "lcd1:MOSI", "white", ["h-30", "v-5"] ],
+        [ "esp:11", "lcd1:MOSI", "orange", ["h-30", "v-5"] ],
         [ "esp:10", "lcd1:CS", "green", [] ],
-        [ "esp:9", "lcd1:RST", "yellow", [] ],
-        [ "esp:46", "lcd1:D/C", "purple", [] ],
-        [ "esp:12", "lcd1:SCK", "blue", ["h-20", "v-5"] ],
-        [ "esp:13", "lcd1:MISO", "red", ["h-10", "v-10"] ],
-        [ "esp:3V3", "lcd1:LED", "limegreen", [] ],
+        [ "esp:9", "lcd1:RST", "brown", [] ],
+        [ "esp:4", "lcd1:D/C", "gray", [] ],
+        [ "esp:12", "lcd1:SCK", "yellow", ["h-20", "v-5"] ],
+        [ "esp:13", "lcd1:MISO", "green", ["h-10", "v-10"] ],
+        [ "esp:14", "lcd1:BLK", "blue", [] ],
+        [ "esp:3V3", "lcd1:LED", "red", [] ],
         [ "esp:GND.1", "lcd1:GND", "black", ["*", "h20"] ],
-        [ "esp:3V3", "lcd1:VCC", "limegreen", [] ]
+        [ "esp:3V3", "lcd1:VCC", "red", [] ]
     ],
     "serialMonitor": {
         "display": "terminal",
