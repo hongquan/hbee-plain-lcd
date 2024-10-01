@@ -1,6 +1,7 @@
 use embedded_graphics::geometry::Point;
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
+use log::info;
 use mipidsi::error::Error as DisplayError;
 use u8g2_fonts::fonts::u8g2_font_unifont_t_vietnamese1;
 use u8g2_fonts::types::{FontColor, HorizontalAlignment, VerticalPosition};
@@ -15,6 +16,7 @@ pub(crate) fn show_intro(driver: &mut FrontDisplayDriver) -> Result<(), Error<Di
     driver
         .clear(Rgb565::CSS_GRAY)
         .map_err(|e| Error::DisplayError(e))?;
+    info!("Made background gray");
     let lines = vec![
         String::from("HBee"),
         format!("Số sê-ri: {}", "hb0000"),
@@ -29,5 +31,6 @@ pub(crate) fn show_intro(driver: &mut FrontDisplayDriver) -> Result<(), Error<Di
         FontColor::Transparent(Rgb565::CSS_CYAN),
         driver,
     )?;
+    info!("Shown {} to LCD", content);
     Ok(())
 }

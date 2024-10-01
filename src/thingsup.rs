@@ -53,6 +53,7 @@ pub(crate) fn init_front_display<'d>(
         })
 }
 
+#[allow(dead_code)]
 pub(crate) fn init_window() -> Result<WindowSystem, UIInitError> {
     let slint_window = MinimalSoftwareWindow::new(RepaintBufferType::ReusedBuffer);
     slint_window.set_size(PhysicalSize::new(

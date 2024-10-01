@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use display_interface_spi::SPIInterface;
 use esp_idf_svc::hal::gpio::{
-    Gpio10, Gpio11, Gpio12, Gpio13, Gpio14, Gpio4, Gpio9, Output, PinDriver
+    Gpio10, Gpio11, Gpio12, Gpio13, Gpio14, Gpio4, Gpio9, Output, PinDriver,
 };
 use esp_idf_svc::hal::peripherals::Peripherals;
 use esp_idf_svc::hal::spi::{SpiDeviceDriver, SpiDriver, SPI2};
@@ -20,6 +20,7 @@ use crate::consts::DISPLAY_WIDTH;
 
 pub struct FrontDisplayBlock {
     pub spi: SPI2,
+    #[allow(dead_code)]
     pub pin_cs: Gpio10,
     pub pin_reset: Gpio9,
     pub pin_dc: Gpio4,
@@ -127,12 +128,14 @@ impl SensorDataMessage {
     }
 }
 
+#[allow(dead_code)]
 pub(crate) struct WindowSystem {
     pub(crate) slint_window: Rc<MinimalSoftwareWindow>,
     pub(crate) app_window: crate::ui::AppWindow,
     pub(crate) line_buffer: [Rgb565Pixel; DISPLAY_WIDTH as usize],
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Default)]
 pub struct AppConfig {
     pub serial_number: String,
