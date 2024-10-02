@@ -14,7 +14,7 @@ pub(crate) const VI_FONT: FontRenderer = FontRenderer::new::<u8g2_font_unifont_t
 
 pub(crate) fn show_intro(driver: &mut FrontDisplayDriver) -> Result<(), Error<DisplayError>> {
     driver
-        .clear(Rgb565::CSS_GRAY)
+        .clear(Rgb565::BLUE)
         .map_err(|e| Error::DisplayError(e))?;
     info!("Made background gray");
     let lines = vec![
@@ -28,7 +28,7 @@ pub(crate) fn show_intro(driver: &mut FrontDisplayDriver) -> Result<(), Error<Di
         Point::new(10, 10),
         VerticalPosition::Baseline,
         HorizontalAlignment::Left,
-        FontColor::Transparent(Rgb565::CSS_CYAN),
+        FontColor::Transparent(Rgb565::CSS_VIOLET),
         driver,
     )?;
     info!("Shown {} to LCD", content);

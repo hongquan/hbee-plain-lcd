@@ -1,3 +1,6 @@
+use core::time::Duration;
+use std::thread::sleep;
+
 use display_interface_spi::SPIInterface;
 use esp_idf_svc::hal::delay::Ets;
 use esp_idf_svc::hal::gpio::{AnyOutputPin, PinDriver};
@@ -7,7 +10,7 @@ use esp_idf_svc::sys::{EspError, ESP_ERR_INVALID_STATE};
 use log::{info, warn};
 use mipidsi::error::InitError;
 use mipidsi::models::ILI9341Rgb565;
-use mipidsi::options::{Orientation, Rotation};
+use mipidsi::options::{ColorOrder, Orientation, Rotation};
 use slint::platform::software_renderer::{MinimalSoftwareWindow, RepaintBufferType, Rgb565Pixel};
 use slint::PhysicalSize;
 
@@ -23,8 +26,6 @@ pub(crate) fn init_front_display<'d>(
     let pin_rst = PinDriver::output(p.pin_reset)?;
     let pin_dc = PinDriver::output(p.pin_dc)?;
     let mut backlight = PinDriver::output(p.pin_backlight)?;
-    info!("Turning on backlight for LCD");
-    backlight.set_high()?;
 
     let config = SpiConfig::default()
         .baudrate(MegaHertz(16).into())
@@ -39,10 +40,15 @@ pub(crate) fn init_front_display<'d>(
         &config,
     )?;
     let spi_interface = SPIInterface::new(device, pin_dc);
+    info!("Turning on backlight for LCD");
+    backlight.set_high()?;
+    // Ref: https://github.com/bjoernQ/rust-esp32s3-ili9341/blob/main/src/main.rs
+    sleep(Duration::from_secs(1));
     mipidsi::Builder::new(ILI9341Rgb565, spi_interface)
         .reset_pin(pin_rst)
         .display_size(DISPLAY_HEIGHT, DISPLAY_WIDTH)
         .orientation(Orientation::new().rotate(Rotation::Deg90))
+        .color_order(ColorOrder::Rgb)
         .init(&mut Ets)
         .map_err(|e| match e {
             InitError::Pin(v) => v.cause(),
