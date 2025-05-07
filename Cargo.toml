@@ -35,6 +35,16 @@ embedded-graphics = "0.8.1"
 mipidsi = "0.8.0"
 u8g2-fonts = { version = "0.4.0", features = ["embedded_graphics_textstyle"] }
 thiserror = "1.0.64"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_with = "3.9.0"
+fastrand = "2.1.1"
+
+[dependencies.slint]
+version = "1.8.0"
+default-features = false
+# Cannot activate "std" feature because the ESP-IDF implementation of std lacks memmap
+features = ["compat-1-2", "unsafe-single-threaded", "libm", "renderer-software"]
 
 [build-dependencies]
 embuild = "0.32.0"
+slint-build = "1.8.0"

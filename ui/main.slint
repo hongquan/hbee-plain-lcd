@@ -1,0 +1,215 @@
+import { VerticalBox, HorizontalBox, GridBox } from "std-widgets.slint";
+
+import { SensorData, Health  } from "./types.slint";
+import { NativeUtils } from "./globals.slint";
+
+export { NativeUtils }
+
+export component AppWindow inherits Window {
+    in property <string> farm_codename;
+    in property <string> serial_number;
+    in property <SensorData> sensor;
+    in property <Health> health;
+    preferred-width: 320px;
+    preferred-height: 240px;
+    default-font-size: 16px;
+    function icon-for-battery-level() -> image {
+        if (root.health.battery-level > 90) {
+            return @image-url("pixelarticons--battery-full.svg");
+        }
+        if (root.health.battery-level >= 50) {
+            return @image-url("pixelarticons--battery-2.svg");
+        }
+        if (root.health.battery-level >= 10) {
+            return @image-url("pixelarticons--battery-1.svg");
+        }
+        return @image-url("pixelarticons--battery.svg");
+    }
+
+    function icon-for-gsm-signal-strengh() -> image {
+        if (root.health.gsm-signal-strength < -113) {
+            return @image-url("pixelarticons--cellular-signal-0.svg");
+        }
+        if (root.health.gsm-signal-strength <= -111) {
+            return @image-url("pixelarticons--cellular-signal-1.svg");
+        }
+        if (root.health.gsm-signal-strength <= -53) {
+            return @image-url("pixelarticons--cellular-signal-2.svg");
+        }
+        return @image-url("pixelarticons--cellular-signal-3.svg");
+    }
+    VerticalBox {
+        alignment: start;
+
+        HorizontalLayout {
+            spacing: 8px;
+            Rectangle {
+                background: darkgray;
+                Text {
+                    text: root.farm_codename;
+                    color: white;
+                }
+            }
+
+            Rectangle {
+                background: darkgray;
+                Text {
+                    text: serial_number;
+                    color: white;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            HorizontalLayout {
+                Image {
+                    source: icon-for-gsm-signal-strengh();
+                    height: 24px;
+                    image-rendering: pixelated;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: root.health.has-gsm-signal-strength ? root.health.gsm-signal-strength + " dBm" : "--";
+                    vertical-alignment: center;
+                }
+            }
+
+            HorizontalLayout {
+                Image {
+                    source: icon-for-battery-level();
+                    height: 24px;
+                    image-rendering: pixelated;
+                    vertical-alignment: center;
+                }
+
+                Text {
+                    text: root.health.has-battery-level ? root.health.battery-level + " %" : "--";
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            Rectangle {
+                Rectangle {
+                    height: 1px;
+                    border-width: 0.5px;
+                    border-color: dimgray;
+                }
+            }
+
+            Text {
+                text: "Môi trường";
+                horizontal-alignment: center;
+            }
+
+            Rectangle {
+                Rectangle {
+                    height: 1px;
+                    border-width: 0.5px;
+                    border-color: dimgray;
+                }
+            }
+        }
+
+        HorizontalLayout {
+            spacing: 4px;
+
+            VerticalLayout {
+
+                HorizontalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: "Nhiệt độ";
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.sensor.has-solution-temperature ? NativeUtils.display-float(root.sensor.solution-temperature) : "--";
+                        font-size: 24px;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: "℃";
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: "EC";
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.sensor.has-electrical-conductivity ? root.sensor.electrical-conductivity : "--";
+                        font-size: 24px;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: "µS/㎠";
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1px;
+                border-width: 0.5px;
+                border-color: dimgray;
+            }
+
+            VerticalLayout {
+                HorizontalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: "pH";
+                        horizontal-alignment: left;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.sensor.has-power-of-hydrogen ? NativeUtils.display-float(root.sensor.power-of-hydrogen) : "--";
+                        font-size: 24px;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: 4px;
+                    Text {
+                        text: "Độ mặn";
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: root.sensor.has-solution-salinity ? NativeUtils.display-float(root.sensor.solution-salinity) : "--";
+                        font-size: 24px;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+
+                    Text {
+                        text: "µS/㎠";
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+    }
+}
