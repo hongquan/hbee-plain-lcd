@@ -13,6 +13,7 @@ export component AppWindow inherits Window {
     preferred-width: 320px;
     preferred-height: 240px;
     default-font-size: 16px;
+
     function icon-for-battery-level() -> image {
         if (root.health.battery-level > 90) {
             return @image-url("pixelarticons--battery-full.svg");
@@ -38,6 +39,7 @@ export component AppWindow inherits Window {
         }
         return @image-url("pixelarticons--cellular-signal-3.svg");
     }
+
     VerticalBox {
         alignment: start;
 
